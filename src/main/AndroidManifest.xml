@@ -30,7 +30,9 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:parentActivityName="com.tg2458.coms6998.homework2.CityPickerActivity">
+
         </activity>
         <activity android:name=".CityPickerActivity">
             <intent-filter>

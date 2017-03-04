@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.content.Intent;
+import android.widget.TableLayout;
 
 
 import com.google.android.gms.common.api.Status;
@@ -17,12 +20,15 @@ import com.google.android.gms.location.places.*;
 public class CityPickerActivity extends AppCompatActivity {
 
     EditText textFieldEntry;
+    private Button button;
+    private TableLayout table;
 
     private static final String TAG = "CityPickerActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_city_picker);
 
         textFieldEntry = (EditText)findViewById(R.id.editText);
@@ -41,8 +47,21 @@ public class CityPickerActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        table = (TableLayout)findViewById(R.id.table);
+
+
+
+        button = (Button)findViewById(R.id.button2);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 if (textFieldEntry.getText().toString().toLowerCase().contains("map"))
                 {
+
                     startActivity(new Intent(CityPickerActivity.this, MapsActivity.class));
                 }
             }
