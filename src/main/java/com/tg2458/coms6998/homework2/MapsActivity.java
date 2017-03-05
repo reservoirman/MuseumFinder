@@ -1,11 +1,10 @@
 package com.tg2458.coms6998.homework2;
 
-import android.support.v4.app.FragmentActivity;
+//import android.app.ActionBar;
 import android.os.Bundle;
-import android.app.ActionBar;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,21 +24,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println("Welcome");
         super.onCreate(savedInstanceState);
 
+
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        ActionBar ab = getActionBar();
+        android.app.ActionBar ab = getActionBar();
+
 
         if (ab != null) {
             System.out.println("ACTION BAR OBTAINED!");
             ab.setDisplayHomeAsUpEnabled(true);
         }
-        else
+        else {
             System.out.println("No action bar obtained!");
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+            //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
 
@@ -55,10 +57,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        Museum m = ((MainApplication)getApplication()).museumList.getMuseum(0);
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney, home of TZG!"));
+        LatLng sydney = new LatLng(m.latitude, m.longitude);
+        mMap.addMarker(new MarkerOptions().position(sydney).title(m.name + ": " + m.address));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(-32, 149)).title("Marker in Sydney, home of TZG!"));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         System.out.println("We made it all the way here!");
     }
@@ -69,8 +73,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                //NavUtils.navigateUpFromSameTask(this);
+
+                NavUtils.navigateUpFromSameTask(this);
                 return true;
+
         }
         return super.onOptionsItemSelected(item);
     }

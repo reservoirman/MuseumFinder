@@ -1,33 +1,29 @@
 package com.tg2458.coms6998.homework2;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.content.Intent;
 import android.widget.TableLayout;
 
-
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-import com.google.android.gms.location.places.*;
 
 public class CityPickerActivity extends AppCompatActivity {
 
     EditText textFieldEntry;
     private Button button;
     private TableLayout table;
+    MuseumList ml;
 
     private static final String TAG = "CityPickerActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ml = ((MainApplication)getApplication()).museumList;
 
         setContentView(R.layout.activity_city_picker);
 
@@ -61,7 +57,7 @@ public class CityPickerActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (textFieldEntry.getText().toString().toLowerCase().contains("map"))
                 {
-
+                    ml.addMuseum(-34, 151, "Sydney Opera House", "123 White Way Sydney AUS");
                     startActivity(new Intent(CityPickerActivity.this, MapsActivity.class));
                 }
             }
