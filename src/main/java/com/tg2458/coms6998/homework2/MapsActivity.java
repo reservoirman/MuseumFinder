@@ -1,11 +1,16 @@
 package com.tg2458.coms6998.homework2;
 
 //import android.app.ActionBar;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -57,13 +62,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Museum m = ((MainApplication)getApplication()).museumList.getMuseum(0);
+        MuseumList ml = ((MainApplication)getApplication()).museumList;
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(m.latitude, m.longitude);
-        mMap.addMarker(new MarkerOptions().position(sydney).title(m.name + ": " + m.address));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(-32, 149)).title("Marker in Sydney, home of TZG!"));
+        for (int i = 0; i < ml.count(); i++)
+        {
+            Museum m = ml.getMuseum(i);
+            LatLng latlng = new LatLng(m.latitude, m.longitude);
+            mMap.addMarker(new MarkerOptions().position(latlng).title(m.name + ": " + m.address));
+        }
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(ml.avgLatitude(), ml.avgLongitude()), 8));
+
         System.out.println("We made it all the way here!");
     }
 
@@ -79,6 +89,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("THE REQUEST CODE IS:  " + requestCode);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                System.out.println("MapsActivity.onActivityResult: Place: " + place.getName());
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                System.out.println("MapsActivity.onActivityResult: " + status.getStatusMessage());
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
     }
 
 }

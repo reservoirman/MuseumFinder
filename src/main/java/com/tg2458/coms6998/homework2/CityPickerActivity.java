@@ -2,6 +2,7 @@ package com.tg2458.coms6998.homework2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,8 +11,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 
-public class CityPickerActivity extends AppCompatActivity {
+
+
+public class CityPickerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     EditText textFieldEntry;
     private Button button;
@@ -20,10 +28,19 @@ public class CityPickerActivity extends AppCompatActivity {
 
     private static final String TAG = "CityPickerActivity";
 
+    GoogleApiClient client;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ml = ((MainApplication)getApplication()).museumList;
+
+        client = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */,
+                        this /* OnConnectionFailedListener */)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addApi(Places.GEO_DATA_API)
+                .build();
 
         setContentView(R.layout.activity_city_picker);
 
@@ -58,33 +75,33 @@ public class CityPickerActivity extends AppCompatActivity {
                 if (textFieldEntry.getText().toString().toLowerCase().contains("map"))
                 {
                     ml.addMuseum(-34, 151, "Sydney Opera House", "123 White Way Sydney AUS");
+                    ml.addMuseum(-33, 149, "Sydney TZG", "Territories Sydney AUS");
                     startActivity(new Intent(CityPickerActivity.this, MapsActivity.class));
                 }
             }
         });
 
-        /*
+
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
-                Log.i(TAG, "Place: " + place.getName());
-            }
+        /*
+        autocompleteFragment.setBoundsBias(new LatLngBounds(
+                new LatLng(-33.880490, 151.184363),
+                new LatLng(-33.858754, 151.229596)));
+        */
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                .build();
 
-            @Override
-            public void onError(Status status) {
-                // TODO: Handle the error.
-                Log.i(TAG, "An error occurred: " + status);
-            }
-        });*/
+        autocompleteFragment.setFilter(typeFilter);
 
-
-
-
+        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client));
     }
 
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

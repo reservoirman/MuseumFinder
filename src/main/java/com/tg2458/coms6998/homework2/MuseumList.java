@@ -16,6 +16,9 @@ class Museum {
 public class MuseumList {
     private ArrayList<Museum> museumArrayList;
 
+    private double sumLatitude = 0;
+    private double sumLongitude = 0;
+
     public MuseumList()
     {
         museumArrayList = new ArrayList<>();
@@ -28,6 +31,8 @@ public class MuseumList {
         m.longitude = longitude;
         m.name = name;
         m.address = address;
+        sumLatitude += latitude;
+        sumLongitude += longitude;
         return museumArrayList.add(m);
     }
 
@@ -39,6 +44,21 @@ public class MuseumList {
     public Museum getMuseum(int index)
     {
         return museumArrayList.get(index);
+    }
+
+    public int count()
+    {
+        return museumArrayList.size();
+    }
+
+    public double avgLatitude()
+    {
+        return sumLatitude / museumArrayList.size();
+    }
+
+    public double avgLongitude()
+    {
+        return sumLongitude / museumArrayList.size();
     }
 
 }
