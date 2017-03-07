@@ -2,16 +2,23 @@ package com.tg2458.coms6998.homework2;
 
 import android.support.annotation.NonNull;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+
+import org.json.JSONObject;
 
 /**
  * Created by LanKyoungHong on 3/5/17.
@@ -20,11 +27,12 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 public class CityListener implements PlaceSelectionListener {
 
     public static final String TAG = "CityListener";
-
+    private RequestQueue queue;
     private GoogleApiClient client;
 
-    public CityListener(GoogleApiClient client){
+    public CityListener(GoogleApiClient client, RequestQueue queue){
         this.client = client;
+        this.queue = queue;
     }
 
 
@@ -36,22 +44,52 @@ public class CityListener implements PlaceSelectionListener {
         System.out.println(TAG +  "Place Address: " + place.getAddress());
         System.out.println(TAG +  "Place Phone Number: " + place.getPhoneNumber());
         System.out.println(TAG +  "Place Coordinates: " + place.getLatLng().toString());
+        System.out.println(TAG +  "Place Viewport: " + place.getViewport().toString());
+
+        String url = "https://maps.googleapis.com/maps/api/place/radarsearch/json?location=51.503186,-0.126446&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk";
+
+        JSONObject arrayOfMuseums = new JSONObject();
+
+        //get list via JSON request
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, arrayOfMuseums, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                System.out.println("We got a response!!!");
+                System.out.println("CityListener here are London's museums: " + response.toString());
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO Auto-generated method stub
+                System.out.println("Damn there was an error: " + error.getMessage());
+            }
+        });
+        queue.add(req);
 
         // Get predicted list programmatically
-        AutocompleteFilter filter = new AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS).build();
+        AutocompleteFilter filter = new AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_ESTABLISHMENT).build();
 
         PendingResult<AutocompletePredictionBuffer> result =
-                Places.GeoDataApi.getAutocompletePredictions(client, place.getName().toString(),
+                Places.GeoDataApi.getAutocompletePredictions(client, "Museum",
                         place.getViewport(), filter);
 
-        AutocompletePredictionBuffer results = result.setResultCallback(
+
+        result.setResultCallback(
                 new ResultCallback<AutocompletePredictionBuffer>() {
                     @Override
                     public void onResult(@NonNull AutocompletePredictionBuffer autocompletePredictions) {
 
+                        System.out.println(TAG + " number of predictions: " + autocompletePredictions.getCount());
+                        for (AutocompletePrediction p : autocompletePredictions)
+                        {
+                            System.out.println(TAG + " " + p.getFullText(null).toString());
+                        }
+
                     }
                 });
-        System.out.println(TAG + " " + results.getCount());
+
 
 
         //store it into the museum list

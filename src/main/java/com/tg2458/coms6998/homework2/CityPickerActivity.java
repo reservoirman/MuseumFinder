@@ -18,7 +18,6 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 
 
-
 public class CityPickerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     EditText textFieldEntry;
@@ -33,7 +32,8 @@ public class CityPickerActivity extends AppCompatActivity implements GoogleApiCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ml = ((MainApplication)getApplication()).museumList;
+        MainApplication main = ((MainApplication)getApplication());
+        ml = main.museumList;
 
         client = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
@@ -96,7 +96,20 @@ public class CityPickerActivity extends AppCompatActivity implements GoogleApiCl
 
         autocompleteFragment.setFilter(typeFilter);
 
-        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client));
+        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client, main.getQueue()));
+
+        /*
+        int PLACE_PICKER_REQUEST = 1;
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+
+        try {
+            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }*/
     }
 
 
