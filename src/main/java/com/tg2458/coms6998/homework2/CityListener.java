@@ -18,6 +18,8 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -48,14 +50,38 @@ public class CityListener implements PlaceSelectionListener {
 
         String url = "https://maps.googleapis.com/maps/api/place/radarsearch/json?location=51.503186,-0.126446&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk";
 
-        JSONObject arrayOfMuseums = new JSONObject();
 
         //get list via JSON request
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, arrayOfMuseums, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("We got a response!!!");
-                System.out.println("CityListener here are London's museums: " + response.toString());
+                System.out.println("CityListener categories: " + response.names());
+
+
+
+                try {
+                    //System.out.println("CityListener dump: " + response.toString(4));
+                    JSONArray arrayOfMuseums = response.getJSONArray("results");
+
+                    System.out.println("London has " + arrayOfMuseums.length() + " museums");
+
+                    for (int i = 0; i < arrayOfMuseums.length(); i++)
+                    {
+                        System.out.println("museum id = " + ((JSONObject)arrayOfMuseums.get(i)).getString("id"));
+                    }
+
+                    while (response.has("id"))
+                    {
+                        String id = response.getString("id");
+                        System.out.println("id = " + id);
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
 
             }
         }, new Response.ErrorListener() {
@@ -67,6 +93,7 @@ public class CityListener implements PlaceSelectionListener {
             }
         });
         queue.add(req);
+
 
         // Get predicted list programmatically
         AutocompleteFilter filter = new AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_ESTABLISHMENT).build();
