@@ -1,7 +1,6 @@
 package com.tg2458.coms6998.homework2;
 
 import android.support.annotation.NonNull;
-import android.widget.ListView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -9,12 +8,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.AutocompleteFilter;
-import com.google.android.gms.location.places.AutocompletePrediction;
-import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
@@ -37,14 +32,12 @@ public class CityListener implements PlaceSelectionListener {
     private RequestQueue queue;
     private GoogleApiClient client;
     private MuseumList ml;
-    private ListView listView;
     private CityAdapter adapter;
 
-    public CityListener(GoogleApiClient client, RequestQueue queue, MuseumList ml, ListView listView, CityAdapter adapter){
+    public CityListener(GoogleApiClient client, RequestQueue queue, MuseumList ml, CityAdapter adapter){
         this.client = client;
         this.queue = queue;
         this.ml = ml;
-        this.listView = listView;
         this.adapter = adapter;
     }
 
@@ -89,7 +82,6 @@ public class CityListener implements PlaceSelectionListener {
                         Places.GeoDataApi.getPlaceById(client, id).setResultCallback(new ResultCallback<PlaceBuffer>() {
                             @Override
                             public void onResult(@NonNull PlaceBuffer places) {
-                                System.out.print("Number of places matching id = " + places.getCount());
                                 Place p = places.get(0);
                                 if (p.getPlaceTypes().contains(Place.TYPE_MUSEUM)) {
                                     ml.addMuseum(p.getLatLng().latitude,
@@ -99,15 +91,16 @@ public class CityListener implements PlaceSelectionListener {
                                     String title = String.format("%s: %s", ml.getLastMuseum().name, ml.getLastMuseum().address);
                                     System.out.println(title);
                                 }
+                                //reload listactivity adapter with cursor with new Museum List
+                                //build list of items
+                                //configure the list view
+                                adapter.notifyDataSetChanged();
+                                System.out.println("Updated Museum List!!");
                             }
                         });
                     }
 
-                    //reload listactivity adapter with cursor with new Museum List
-                    //build list of items
-                    //configure the list view
-                    adapter.notifyDataSetChanged();
-                    listView.setAdapter(adapter);
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -128,6 +121,7 @@ public class CityListener implements PlaceSelectionListener {
 
 
         // Get predicted list programmatically
+        /*
         AutocompleteFilter filter = new AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_ESTABLISHMENT).build();
 
         PendingResult<AutocompletePredictionBuffer> result =
@@ -148,7 +142,7 @@ public class CityListener implements PlaceSelectionListener {
 
                     }
                 });
-
+        */
 
 
         //store it into the museum list

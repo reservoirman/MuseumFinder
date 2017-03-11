@@ -6,11 +6,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -35,7 +35,6 @@ public class CityPickerActivity extends AppCompatActivity
     private static final String TAG = "CityPickerActivity";
 
     GoogleApiClient client;
-    SimpleCursorAdapter mAdapter;
     CityAdapter adapter;
 
     @Override
@@ -112,10 +111,20 @@ public class CityPickerActivity extends AppCompatActivity
         //String [] holla = {"welcome", "to", "the", "jungle"};
         //ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, holla);
 
-        ListView list = (ListView)findViewById(R.id.listVIew);
-        list.setAdapter(adapter);
+        listView = (ListView)findViewById(R.id.listVIew);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Museum m = ml.getMuseum(position);
 
-        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client, main.getQueue(), ml, list, adapter));
+                Intent intent = new Intent(CityPickerActivity.this, MapsActivity.class);
+                intent.putExtra("MuseumLocation", m);
+
+                startActivity(intent);
+            }
+        });
+        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client, main.getQueue(), ml, adapter));
 
 
         //listView.setAdapter(adapter);

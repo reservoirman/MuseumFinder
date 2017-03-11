@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private Museum m;
 
 
 
@@ -35,6 +36,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        Intent intent = getIntent();
 
         android.app.ActionBar ab = getActionBar();
 
@@ -62,6 +65,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        m = (Museum)getIntent().getParcelableExtra("MuseumLocation");
+
+        if (m == null) System.out.println("Why is this object null??????");
+        else {
+            System.out.println("HELLO");
+        }
+
+        LatLng latlng = new LatLng(m.latitude, m.longitude);
+        mMap.addMarker(new MarkerOptions().position(latlng).title(m.name + ": " + m.address));
+
+        /*
         MuseumList ml = ((MainApplication)getApplication()).museumList;
         // Add a marker in Sydney and move the camera
         for (int i = 0; i < ml.count(); i++)
@@ -69,11 +84,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Museum m = ml.getMuseum(i);
             LatLng latlng = new LatLng(m.latitude, m.longitude);
             mMap.addMarker(new MarkerOptions().position(latlng).title(m.name + ": " + m.address));
-        }
+        }*/
+
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(ml.avgLatitude(), ml.avgLongitude()), 8));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15));
 
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 16));
         System.out.println("We made it all the way here!");
     }
 

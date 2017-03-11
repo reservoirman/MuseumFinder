@@ -1,17 +1,53 @@
 package com.tg2458.coms6998.homework2;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
 /**
  * Created by LanKyoungHong on 3/5/17.
  */
 
-class Museum {
+class Museum implements Parcelable{
     double latitude;
     double longitude;
     String name;
     String address;
+
+    protected Museum(Parcel in) {
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        name = in.readString();
+        address = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
+        dest.writeString(name);
+        dest.writeString(address);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Museum> CREATOR = new Creator<Museum>() {
+        @Override
+        public Museum createFromParcel(Parcel in) {
+            return new Museum(in);
+        }
+
+        @Override
+        public Museum[] newArray(int size) {
+            return new Museum[size];
+        }
+    };
 }
+
 
 public class MuseumList {
     private ArrayList<Museum> museumArrayList;
@@ -36,7 +72,7 @@ public class MuseumList {
 
     public boolean addMuseum(double latitude, double longitude, String name, String address)
     {
-        Museum m = new Museum();
+        Museum m = new Museum(Parcel.obtain());
         m.latitude = latitude;
         m.longitude = longitude;
         m.name = name;

@@ -16,9 +16,16 @@ import java.util.List;
 public class CityAdapter extends ArrayAdapter<Museum>
 {
 
+    Context _context;
+    List<Museum> ml;
+    LayoutInflater layoutInflater;
+
     public CityAdapter(Context context, int resource, List<Museum> objects) {
 
         super(context, resource, objects);
+        _context = context;
+        layoutInflater = LayoutInflater.from(_context);
+        ml = objects;
         System.out.println("CONSTRUCTOR!");
     }
 
@@ -26,15 +33,18 @@ public class CityAdapter extends ArrayAdapter<Museum>
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        Museum user = getItem(position);
+        System.out.println("CALL THIS!!!");
+        Museum user = ml.get(position);
         System.out.println(user.latitude + " and " + user.longitude);
         // Check if an existing view is being reused, otherwise inflate the view
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+
+            convertView = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            //LayoutInflater.from(_context.inflate(android.R.layout.simple_list_item_1, parent, false);
         }
         // Lookup view for data population
-        TextView tvName = (TextView) convertView.findViewById(R.id.text1);
+        TextView tvName = (TextView) convertView;//.findViewById(android.R.id.text1);
 
         if (tvName == null)
         {
