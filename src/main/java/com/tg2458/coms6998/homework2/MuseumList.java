@@ -19,9 +19,19 @@ public class MuseumList {
     private double sumLatitude = 0;
     private double sumLongitude = 0;
 
+    public ArrayList<Museum> getMuseumArrayList()
+    {
+        return museumArrayList;
+    }
+
     public MuseumList()
     {
         museumArrayList = new ArrayList<>();
+    }
+
+    public void clearList()
+    {
+        museumArrayList.clear();
     }
 
     public boolean addMuseum(double latitude, double longitude, String name, String address)
@@ -44,6 +54,17 @@ public class MuseumList {
     public Museum getMuseum(int index)
     {
         return museumArrayList.get(index);
+    }
+
+    public Museum getLastMuseum()
+    {
+        if (museumArrayList.size() > 0) {
+            return museumArrayList.get(museumArrayList.size() - 1);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public int count()

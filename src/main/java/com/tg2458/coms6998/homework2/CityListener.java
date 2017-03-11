@@ -1,6 +1,7 @@
 package com.tg2458.coms6998.homework2;
 
 import android.support.annotation.NonNull;
+import android.widget.ListView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -15,12 +16,16 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+//TSG had to use volley (Google Places for Web services) because the Google Places for Android
+// lacks a search feature, only automatic prediction which returns only up to 5 max
 
 /**
  * Created by LanKyoungHong on 3/5/17.
@@ -31,11 +36,18 @@ public class CityListener implements PlaceSelectionListener {
     public static final String TAG = "CityListener";
     private RequestQueue queue;
     private GoogleApiClient client;
+    private MuseumList ml;
+    private ListView listView;
+    private CityAdapter adapter;
 
-    public CityListener(GoogleApiClient client, RequestQueue queue){
+    public CityListener(GoogleApiClient client, RequestQueue queue, MuseumList ml, ListView listView, CityAdapter adapter){
         this.client = client;
         this.queue = queue;
+        this.ml = ml;
+        this.listView = listView;
+        this.adapter = adapter;
     }
+
 
 
     @Override
@@ -48,9 +60,13 @@ public class CityListener implements PlaceSelectionListener {
         System.out.println(TAG +  "Place Coordinates: " + place.getLatLng().toString());
         System.out.println(TAG +  "Place Viewport: " + place.getViewport().toString());
 
-        String url = "https://maps.googleapis.com/maps/api/place/radarsearch/json?location=51.503186,-0.126446&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk";
+
+        String url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%f,%f&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk", place.getLatLng().latitude, place.getLatLng().longitude);
+        String url2 = "https://maps.googleapis.com/maps/api/place/radarsearch/json?location=51.503186,-0.126446&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk";
+        //url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=51.503186,-0.126446&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk";
 
 
+        final String cityName = place.getName().toString();
         //get list via JSON request
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -58,25 +74,41 @@ public class CityListener implements PlaceSelectionListener {
                 System.out.println("We got a response!!!");
                 System.out.println("CityListener categories: " + response.names());
 
-
+                ml.clearList();
 
                 try {
                     //System.out.println("CityListener dump: " + response.toString(4));
                     JSONArray arrayOfMuseums = response.getJSONArray("results");
 
-                    System.out.println("London has " + arrayOfMuseums.length() + " museums");
+                    System.out.println(cityName + " has " + arrayOfMuseums.length() + " museums");
 
                     for (int i = 0; i < arrayOfMuseums.length(); i++)
                     {
-                        System.out.println("museum id = " + ((JSONObject)arrayOfMuseums.get(i)).getString("id"));
+                        String id = ((JSONObject)arrayOfMuseums.get(i)).getString("place_id");
+
+                        Places.GeoDataApi.getPlaceById(client, id).setResultCallback(new ResultCallback<PlaceBuffer>() {
+                            @Override
+                            public void onResult(@NonNull PlaceBuffer places) {
+                                System.out.print("Number of places matching id = " + places.getCount());
+                                Place p = places.get(0);
+                                if (p.getPlaceTypes().contains(Place.TYPE_MUSEUM)) {
+                                    ml.addMuseum(p.getLatLng().latitude,
+                                            p.getLatLng().longitude,
+                                            p.getName().toString(),
+                                            p.getAddress().toString());
+                                    String title = String.format("%s: %s", ml.getLastMuseum().name, ml.getLastMuseum().address);
+                                    System.out.println(title);
+                                }
+                            }
+                        });
                     }
 
-                    while (response.has("id"))
-                    {
-                        String id = response.getString("id");
-                        System.out.println("id = " + id);
+                    //reload listactivity adapter with cursor with new Museum List
+                    //build list of items
+                    //configure the list view
+                    adapter.notifyDataSetChanged();
+                    listView.setAdapter(adapter);
 
-                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

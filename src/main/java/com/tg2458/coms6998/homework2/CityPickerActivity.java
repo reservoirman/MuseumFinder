@@ -1,15 +1,19 @@
 package com.tg2458.coms6998.homework2;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TableLayout;
+import android.widget.ListView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -17,17 +21,22 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 
+//import android.app.LoaderManager;
 
-public class CityPickerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+
+public class CityPickerActivity extends AppCompatActivity
+        implements GoogleApiClient.OnConnectionFailedListener, LoaderManager.LoaderCallbacks<Cursor>  {
 
     EditText textFieldEntry;
     private Button button;
-    private TableLayout table;
+    private ListView listView;
     MuseumList ml;
 
     private static final String TAG = "CityPickerActivity";
 
     GoogleApiClient client;
+    SimpleCursorAdapter mAdapter;
+    CityAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +73,9 @@ public class CityPickerActivity extends AppCompatActivity implements GoogleApiCl
             }
         });
 
-        table = (TableLayout)findViewById(R.id.table);
 
+
+        //listView = (ListView)findViewById(R.id.listView);
 
 
         button = (Button)findViewById(R.id.button2);
@@ -96,20 +106,28 @@ public class CityPickerActivity extends AppCompatActivity implements GoogleApiCl
 
         autocompleteFragment.setFilter(typeFilter);
 
-        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client, main.getQueue()));
+        adapter = new CityAdapter(this,
+                android.R.layout.simple_list_item_1, ml.getMuseumArrayList());
 
-        /*
-        int PLACE_PICKER_REQUEST = 1;
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        //String [] holla = {"welcome", "to", "the", "jungle"};
+        //ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, holla);
+
+        ListView list = (ListView)findViewById(R.id.listVIew);
+        list.setAdapter(adapter);
+
+        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client, main.getQueue(), ml, list, adapter));
 
 
-        try {
-            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }*/
+        //listView.setAdapter(adapter);
+        // Prepare the loader.  Either re-connect with an existing one,
+        // or start a new one.
+        getSupportLoaderManager().initLoader(0, null, this);
+        /*listView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TSG set intent to MapActivity
+            }
+        });*/
     }
 
 
@@ -117,4 +135,23 @@ public class CityPickerActivity extends AppCompatActivity implements GoogleApiCl
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // Now create and return a CursorLoader that will take care of
+        // creating a Cursor for the data being displayed.
+        return null;
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        //mAdapter.swapCursor(data);
+    }
+
+
 }
