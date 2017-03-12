@@ -1,6 +1,7 @@
 package com.tg2458.coms6998.homework2;
 
 import android.support.annotation.NonNull;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -33,12 +34,14 @@ public class CityListener implements PlaceSelectionListener {
     private GoogleApiClient client;
     private MuseumList ml;
     private CityAdapter adapter;
+    private TextView tv;
 
-    public CityListener(GoogleApiClient client, RequestQueue queue, MuseumList ml, CityAdapter adapter){
+    public CityListener(GoogleApiClient client, RequestQueue queue, MuseumList ml, CityAdapter adapter, TextView tv){
         this.client = client;
         this.queue = queue;
         this.ml = ml;
         this.adapter = adapter;
+        this.tv = tv;
     }
 
 
@@ -54,7 +57,7 @@ public class CityListener implements PlaceSelectionListener {
         System.out.println(TAG +  "Place Viewport: " + place.getViewport().toString());
 
 
-        String url = String.format("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%f,%f&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk", place.getLatLng().latitude, place.getLatLng().longitude);
+        String url = String.format("https://maps.googleapis.com/maps/api/place/radarsearch/json?location=%f,%f&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk", place.getLatLng().latitude, place.getLatLng().longitude);
         String url2 = "https://maps.googleapis.com/maps/api/place/radarsearch/json?location=51.503186,-0.126446&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk";
         //url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=51.503186,-0.126446&radius=5000&type=museum&key=AIzaSyAxJ2BBo0BmkgvuER58fpsGdsyTjWV9nOk";
 
@@ -74,6 +77,7 @@ public class CityListener implements PlaceSelectionListener {
                     JSONArray arrayOfMuseums = response.getJSONArray("results");
 
                     System.out.println(cityName + " has " + arrayOfMuseums.length() + " museums");
+                    tv.setText(cityName + " has " + arrayOfMuseums.length() + " museums");
 
                     for (int i = 0; i < arrayOfMuseums.length(); i++)
                     {

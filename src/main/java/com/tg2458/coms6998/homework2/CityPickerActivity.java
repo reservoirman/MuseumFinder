@@ -7,13 +7,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,44 +51,23 @@ public class CityPickerActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_city_picker);
 
-        textFieldEntry = (EditText)findViewById(R.id.editText);
-
-        textFieldEntry.setText("");
-
-        textFieldEntry.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
 
 
         //listView = (ListView)findViewById(R.id.listView);
 
 
+        /*
         button = (Button)findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (textFieldEntry.getText().toString().toLowerCase().contains("map"))
                 {
-                    ml.addMuseum(-34, 151, "Sydney Opera House", "123 White Way Sydney AUS");
-                    ml.addMuseum(-33, 149, "Sydney TZG", "Territories Sydney AUS");
                     startActivity(new Intent(CityPickerActivity.this, MapsActivity.class));
                 }
             }
         });
-
+        */
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -106,7 +84,7 @@ public class CityPickerActivity extends AppCompatActivity
         autocompleteFragment.setFilter(typeFilter);
 
         adapter = new CityAdapter(this,
-                android.R.layout.simple_list_item_1, ml.getMuseumArrayList());
+                android.R.layout.simple_list_item_2, ml.getMuseumArrayList());
 
         //String [] holla = {"welcome", "to", "the", "jungle"};
         //ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, holla);
@@ -124,7 +102,9 @@ public class CityPickerActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
-        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client, main.getQueue(), ml, adapter));
+
+        TextView tv = (TextView)findViewById(R.id.textView);
+        autocompleteFragment.setOnPlaceSelectedListener(new CityListener(client, main.getQueue(), ml, adapter, tv));
 
 
         //listView.setAdapter(adapter);

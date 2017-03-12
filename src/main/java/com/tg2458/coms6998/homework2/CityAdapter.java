@@ -40,11 +40,15 @@ public class CityAdapter extends ArrayAdapter<Museum>
 
         if (convertView == null) {
 
-            convertView = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            convertView = layoutInflater.inflate(android.R.layout.simple_list_item_2, parent, false);
             //LayoutInflater.from(_context.inflate(android.R.layout.simple_list_item_1, parent, false);
         }
         // Lookup view for data population
-        TextView tvName = (TextView) convertView;//.findViewById(android.R.id.text1);
+        //TextView tvName = (TextView) convertView;//.findViewById(android.R.id.text1);
+
+        TextView tvName = (TextView) convertView.findViewById(android.R.id.text1);
+        TextView tvAddress = (TextView) convertView.findViewById(android.R.id.text2);
+
 
         if (tvName == null)
         {
@@ -53,7 +57,9 @@ public class CityAdapter extends ArrayAdapter<Museum>
 
         else {
             // Populate the data into the template view using the data object
-            tvName.setText(user.name + ": " + user.address);
+            //tvName.setText(user.name + ": " + user.address);
+            tvName.setText(user.name);
+            tvAddress.setText(user.address);
             System.out.println(tvName.getText());
         }
         // Return the completed view to render on screen
